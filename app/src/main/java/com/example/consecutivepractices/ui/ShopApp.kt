@@ -8,17 +8,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.consecutivepractices.viewmodel.ProductViewModel
 
 @Composable
-fun ShopApp(
-    productViewModel: ProductViewModel = viewModel()
-) {
+fun ShopApp() {
 
     val navController = rememberNavController()
 
@@ -82,7 +78,6 @@ fun ShopApp(
             composable("products") {
 
                 ProductListScreen(
-                    products = productViewModel.products,
                     onProductClick = { productId ->
 
                         navController.navigate(
@@ -93,7 +88,6 @@ fun ShopApp(
             }
 
             composable("profile") {
-
                 ProfileScreen()
             }
 
@@ -104,17 +98,15 @@ fun ShopApp(
                         ?.getString("productId")
                         ?.toIntOrNull()
 
-                val product =
-                    productId?.let {
-                        productViewModel.getProductById(it)
-                    }
+                if (productId != null) {
 
-                ProductDetailScreen(
-                    product = product,
-                    onBackClick = {
-                        navController.popBackStack()
-                    }
-                )
+                    ProductDetailScreen(
+                        productId = productId,
+                        onBackClick = {
+                            navController.popBackStack()
+                        }
+                    )
+                }
             }
         }
     }

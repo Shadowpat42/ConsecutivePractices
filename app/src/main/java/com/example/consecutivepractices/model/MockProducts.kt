@@ -1,10 +1,6 @@
-package com.example.consecutivepractices.viewmodel
+package com.example.consecutivepractices.model
 
-import androidx.lifecycle.ViewModel
-import com.example.consecutivepractices.model.Product
-import com.example.consecutivepractices.model.Rating
-
-class ProductViewModel : ViewModel() {
+object MockProducts {
 
     val products = listOf(
         Product(
@@ -85,10 +81,4 @@ class ProductViewModel : ViewModel() {
             )
         )
     )
-
-    fun getProductById(id: Int): Product? {
-        return products.find { product ->
-            product.id == id
-        }
-    }
 }

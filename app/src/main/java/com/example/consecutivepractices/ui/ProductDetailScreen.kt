@@ -1,9 +1,7 @@
 package com.example.consecutivepractices.ui
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,13 +17,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.consecutivepractices.model.Product
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.consecutivepractices.viewmodel.ProductDetailViewModel
 
 @Composable
 fun ProductDetailScreen(
-    product: Product?,
+    productId: Int,
     onBackClick: () -> Unit
 ) {
+
+    val viewModel: ProductDetailViewModel = viewModel()
+
+    val product = viewModel.getProductById(productId)
 
     if (product == null) {
         Text(

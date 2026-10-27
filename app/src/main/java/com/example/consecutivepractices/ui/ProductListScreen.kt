@@ -15,13 +15,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.consecutivepractices.model.Product
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.consecutivepractices.viewmodel.ProductListViewModel
 
 @Composable
 fun ProductListScreen(
-    products: List<Product>,
     onProductClick: (Int) -> Unit
 ) {
+
+    val viewModel: ProductListViewModel = viewModel()
+
+    val products = viewModel.products
 
     LazyColumn {
 
