@@ -16,7 +16,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
+import com.example.consecutivepractices.domain.model.Product
 import com.example.consecutivepractices.viewmodel.ProductListViewModel
+import com.example.consecutivepractices.viewmodel.ProductUiState
 
 @Composable
 fun ProductListScreen(
@@ -25,7 +28,15 @@ fun ProductListScreen(
 
     val viewModel: ProductListViewModel = viewModel()
 
-    val products = viewModel.products
+    when (val state = viewModel.uiState) {
+        ProductUiState.Loading -> ProductLoading()
+        is ProductUiState.Success -> ProductList(state.data, onProductClick)
+        is ProductUiState.Error -> ProductLoadError(state.message, viewModel::loadProducts)
+    }
+}
+
+@Composable
+private fun ProductList(products: List<Product>, onProductClick: (Int) -> Unit) {
 
     LazyColumn {
 
@@ -38,7 +49,7 @@ fun ProductListScreen(
             )
         }
 
-        items(products) { product ->
+        items(products, key = { it.id }) { product ->
 
             Card(
                 modifier = Modifier
@@ -55,6 +66,12 @@ fun ProductListScreen(
                 Column(
                     modifier = Modifier.padding(16.dp)
                 ) {
+
+                    AsyncImage(
+                        model = product.image,
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxWidth().height(120.dp)
+                    )
 
                     Text(
                         text = product.title,

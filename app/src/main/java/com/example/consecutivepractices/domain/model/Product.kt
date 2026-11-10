@@ -1,4 +1,4 @@
-package com.example.consecutivepractices.model
+package com.example.consecutivepractices.domain.model
 
 data class Rating(
     val rate: Double,

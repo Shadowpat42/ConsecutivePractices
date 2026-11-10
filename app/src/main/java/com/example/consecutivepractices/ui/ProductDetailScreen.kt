@@ -1,6 +1,5 @@
 package com.example.consecutivepractices.ui
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,13 +11,16 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
+import com.example.consecutivepractices.domain.model.Product
 import com.example.consecutivepractices.viewmodel.ProductDetailViewModel
+import com.example.consecutivepractices.viewmodel.ProductUiState
 
 @Composable
 fun ProductDetailScreen(
@@ -28,32 +30,26 @@ fun ProductDetailScreen(
 
     val viewModel: ProductDetailViewModel = viewModel()
 
-    val product = viewModel.getProductById(productId)
-
-    if (product == null) {
-        Text(
-            text = "Товар не найден",
-            modifier = Modifier.padding(16.dp)
-        )
-
-        return
+    LaunchedEffect(productId) {
+        viewModel.loadProduct(productId)
     }
 
-    Column(
-        modifier = Modifier
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp)
-    ) {
-
-        TextButton(
-            onClick = onBackClick
-        ) {
+    Column(modifier = Modifier.padding(16.dp)) {
+        TextButton(onClick = onBackClick) {
             Text("← Назад")
         }
 
-        Spacer(
-            modifier = Modifier.height(8.dp)
-        )
+        when (val state = viewModel.uiState) {
+            ProductUiState.Loading -> ProductLoading()
+            is ProductUiState.Success -> ProductDetails(state.data)
+            is ProductUiState.Error -> ProductLoadError(state.message, viewModel::retry)
+        }
+    }
+}
+
+@Composable
+private fun ProductDetails(product: Product) {
+    Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
 
         Text(
             text = product.title,
@@ -71,15 +67,11 @@ fun ProductDetailScreen(
                 .height(200.dp)
         ) {
 
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "🛍",
-                    fontSize = 70.sp
-                )
-            }
+            AsyncImage(
+                model = product.image,
+                contentDescription = product.title,
+                modifier = Modifier.fillMaxWidth().height(200.dp).padding(8.dp)
+            )
         }
 
         Spacer(
