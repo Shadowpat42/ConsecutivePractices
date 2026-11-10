@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    id("com.google.devtools.ksp") version "2.3.12"
 }
 
 android {
@@ -36,6 +37,13 @@ android {
 }
 
 dependencies {
+    implementation("androidx.datastore:datastore-preferences:1.2.1")
+    implementation("androidx.room:room-runtime:2.8.4")
+    ksp("androidx.room:room-compiler:2.8.4")
+    debugImplementation("com.github.chuckerteam.chucker:library:4.3.1")
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+    implementation("io.coil-kt:coil-compose:2.7.0")
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)
@@ -51,4 +59,6 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
+    implementation("androidx.navigation:navigation-compose:2.10.2")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.11.0")
 }
