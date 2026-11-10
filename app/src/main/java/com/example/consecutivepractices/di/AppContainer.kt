@@ -2,6 +2,8 @@ package com.example.consecutivepractices.di
 
 import android.content.Context
 import androidx.room.Room
+import com.example.consecutivepractices.data.platform.notification.AlarmManagerLessonReminderScheduler
+import com.example.consecutivepractices.domain.usecase.ScheduleLessonReminderUseCase
 import com.example.consecutivepractices.data.local.database.AppDatabase
 import com.example.consecutivepractices.data.local.preferences.FilterPreferencesDataSource
 import com.example.consecutivepractices.data.local.preferences.ProfilePreferencesDataSource
@@ -40,6 +42,9 @@ object AppContainer {
     lateinit var resumeDownloader: ResumeDownloader
         private set
 
+    lateinit var scheduleLessonReminder: ScheduleLessonReminderUseCase
+        private set
+
     fun initialize(context: Context) {
         val appContext = context.applicationContext
         val profileRepository = ProfileRepositoryImpl(ProfilePreferencesDataSource(appContext))
@@ -47,6 +52,9 @@ object AppContainer {
         saveProfile = SaveProfileUseCase(profileRepository)
         profileImages = ProfileImageManager(appContext)
         resumeDownloader = ResumeDownloader(appContext)
+        scheduleLessonReminder = ScheduleLessonReminderUseCase(
+            AlarmManagerLessonReminderScheduler(appContext)
+        )
         filters = FilterRepositoryImpl(FilterPreferencesDataSource(context))
         val database = Room.databaseBuilder(
             context.applicationContext, AppDatabase::class.java, "favorites.db"

@@ -12,13 +12,15 @@ class ProfilePreferencesDataSource(context: Context) {
     private val positionKey = stringPreferencesKey("profile_position")
     private val avatarKey = stringPreferencesKey("profile_avatar")
     private val resumeKey = stringPreferencesKey("profile_resume")
+    private val lessonTimeKey = stringPreferencesKey("profile_favorite_lesson_time")
 
     fun observe() = dataStore.data.map { preferences ->
         UserProfile(
             fullName = preferences[fullNameKey].orEmpty(),
             position = preferences[positionKey].orEmpty(),
             avatarUri = preferences[avatarKey],
-            resumeUrl = preferences[resumeKey].orEmpty()
+            resumeUrl = preferences[resumeKey].orEmpty(),
+            favoriteLessonTime = preferences[lessonTimeKey].orEmpty()
         )
     }
 
@@ -27,6 +29,7 @@ class ProfilePreferencesDataSource(context: Context) {
             preferences[fullNameKey] = profile.fullName
             preferences[positionKey] = profile.position
             preferences[resumeKey] = profile.resumeUrl
+            preferences[lessonTimeKey] = profile.favoriteLessonTime
             val avatar = profile.avatarUri
             if (avatar == null) preferences.remove(avatarKey)
             else preferences[avatarKey] = avatar
