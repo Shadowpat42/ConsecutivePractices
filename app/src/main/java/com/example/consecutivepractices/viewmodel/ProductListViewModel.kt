@@ -15,6 +15,9 @@ class ProductListViewModel : ViewModel() {
     var uiState by mutableStateOf<ProductUiState<List<Product>>>(ProductUiState.Loading)
         private set
 
+    private val badgeCache = AppContainer.filterBadgeCache
+    val hasActiveFilters = badgeCache.hasActiveFilters
+
     private var loadJob: Job? = null
 
     init {
@@ -22,12 +25,15 @@ class ProductListViewModel : ViewModel() {
     }
 
     fun loadProducts() {
-        if (loadJob?.isActive == true) return
+        loadJob?.cancel()
 
         uiState = ProductUiState.Loading
         loadJob = viewModelScope.launch {
             try {
-                uiState = ProductUiState.Success(AppContainer.getProducts())
+                val filter = AppContainer.filters.load()
+                badgeCache.update(filter.hasActiveFilters)
+                val products = AppContainer.getProducts()
+                uiState = ProductUiState.Success(products.filter(filter::matches))
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {

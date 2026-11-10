@@ -15,6 +15,34 @@ class ProductDetailViewModel : ViewModel() {
     var uiState by mutableStateOf<ProductUiState<Product>>(ProductUiState.Loading)
         private set
 
+    private val favorites = AppContainer.favorites
+    var isFavorite by mutableStateOf(false)
+        private set
+    var isUpdatingFavorite by mutableStateOf(false)
+        private set
+    var favoriteError by mutableStateOf<String?>(null)
+        private set
+
+    fun toggleFavorite() {
+        val product = (uiState as? ProductUiState.Success)?.data ?: return
+        if (isUpdatingFavorite) return
+        isUpdatingFavorite = true
+        favoriteError = null
+        viewModelScope.launch {
+            try {
+                val newValue = !isFavorite
+                favorites.setFavorite(product, newValue)
+                isFavorite = newValue
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                favoriteError = "Не удалось изменить избранное."
+            } finally {
+                isUpdatingFavorite = false
+            }
+        }
+    }
+
     private var loadedId: Int? = null
     private var loadJob: Job? = null
 
@@ -33,7 +61,9 @@ class ProductDetailViewModel : ViewModel() {
         uiState = ProductUiState.Loading
         loadJob = viewModelScope.launch {
             try {
-                uiState = ProductUiState.Success(AppContainer.getProductById(id))
+                val product = AppContainer.getProductById(id)
+                isFavorite = favorites.contains(id)
+                uiState = ProductUiState.Success(product)
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {

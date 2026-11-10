@@ -7,7 +7,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -41,7 +43,16 @@ fun ProductDetailScreen(
 
         when (val state = viewModel.uiState) {
             ProductUiState.Loading -> ProductLoading()
-            is ProductUiState.Success -> ProductDetails(state.data)
+            is ProductUiState.Success -> {
+                Button(
+                    onClick = viewModel::toggleFavorite,
+                    enabled = !viewModel.isUpdatingFavorite
+                ) {
+                    Text(if (viewModel.isFavorite) "★ Убрать из избранного" else "☆ В избранное")
+                }
+                viewModel.favoriteError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+                ProductDetails(state.data)
+            }
             is ProductUiState.Error -> ProductLoadError(state.message, viewModel::retry)
         }
     }

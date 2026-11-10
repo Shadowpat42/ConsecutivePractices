@@ -6,6 +6,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
@@ -26,7 +27,8 @@ fun ShopApp() {
 
     val showBottomBar =
         currentRoute == "products" ||
-                currentRoute == "profile"
+                currentRoute == "profile" ||
+                currentRoute == "favorites"
 
     Scaffold(
         bottomBar = {
@@ -39,6 +41,7 @@ fun ShopApp() {
                         selected = currentRoute == "products",
                         onClick = {
                             navController.navigate("products") {
+                                popUpTo("products")
                                 launchSingleTop = true
                             }
                         },
@@ -51,10 +54,27 @@ fun ShopApp() {
                     )
 
                     NavigationBarItem(
+                        selected = currentRoute == "favorites",
+                        onClick = {
+                            if (currentRoute != "favorites") {
+                                navController.navigate("favorites") {
+                                    popUpTo("products")
+                                    launchSingleTop = true
+                                }
+                            }
+                        },
+                        icon = { Text("★") },
+                        label = { Text("Избранное") }
+                    )
+
+                    NavigationBarItem(
                         selected = currentRoute == "profile",
                         onClick = {
-                            navController.navigate("profile") {
-                                launchSingleTop = true
+                            if (currentRoute != "profile") {
+                                navController.navigate("profile") {
+                                    popUpTo("products")
+                                    launchSingleTop = true
+                                }
                             }
                         },
                         icon = {
@@ -75,16 +95,31 @@ fun ShopApp() {
             modifier = Modifier.padding(innerPadding)
         ) {
 
-            composable("products") {
+            composable("products") { entry ->
+                val filtersSaved by entry.savedStateHandle
+                    .getStateFlow("filtersSaved", false)
+                    .collectAsState()
 
                 ProductListScreen(
-                    onProductClick = { productId ->
-
-                        navController.navigate(
-                            "details/$productId"
-                        )
-                    }
+                    onProductClick = { id -> navController.navigate("details/$id") },
+                    onFiltersClick = { navController.navigate("filters") },
+                    filtersSaved = filtersSaved,
+                    onFiltersHandled = { entry.savedStateHandle["filtersSaved"] = false }
                 )
+            }
+
+            composable("filters") {
+                FiltersScreen(
+                    onDone = {
+                        navController.previousBackStackEntry?.savedStateHandle?.set("filtersSaved", true)
+                        navController.popBackStack()
+                    },
+                    onBack = { navController.popBackStack() }
+                )
+            }
+
+            composable("favorites") {
+                FavoritesScreen()
             }
 
             composable("profile") {
