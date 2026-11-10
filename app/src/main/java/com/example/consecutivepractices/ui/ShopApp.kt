@@ -123,7 +123,11 @@ fun ShopApp() {
             }
 
             composable("profile") {
-                ProfileScreen()
+                ProfileScreen(onEdit = { navController.navigate("profile/edit") })
+            }
+
+            composable("profile/edit") {
+                EditProfileScreen(onBack = { navController.popBackStack() })
             }
 
             composable("details/{productId}") { entry ->

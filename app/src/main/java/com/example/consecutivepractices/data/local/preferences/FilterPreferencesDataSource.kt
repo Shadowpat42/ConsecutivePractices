@@ -8,10 +8,10 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.example.consecutivepractices.domain.model.ProductFilter
 import kotlinx.coroutines.flow.first
 
-private val Context.filterDataStore by preferencesDataStore(name = "product_filters")
+internal val Context.shopPreferences by preferencesDataStore(name = "product_filters")
 
 class FilterPreferencesDataSource(context: Context) {
-    private val dataStore = context.applicationContext.filterDataStore
+    private val dataStore = context.applicationContext.shopPreferences
     private val categoryKey = stringPreferencesKey("category")
     private val ratingKey = floatPreferencesKey("min_rating")
 
